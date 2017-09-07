@@ -1,0 +1,3 @@
+terminal_user: 'vyos'
+terminal_password: 'demo'
+terminal_ip: '192.168.10.14'

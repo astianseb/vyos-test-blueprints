@@ -1,0 +1,5 @@
+set interfaces tunnel tun3 address '192.168.200.9/30'
+set interfaces tunnel tun3 encapsulation 'gre'
+set interfaces tunnel tun3 local-ip '192.168.10.14'
+set interfaces tunnel tun3 remote-ip '192.168.10.100'
+

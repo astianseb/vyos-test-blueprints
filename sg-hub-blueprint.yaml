@@ -1,0 +1,72 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/4.0/types.yaml
+  - https://raw.githubusercontent.com/cloudify-incubator/cloudify-utilities-plugin/1.3.0/plugin.yaml
+
+inputs:
+
+  terminal_ip:
+    type: string
+    description: >
+       terminal server ip
+    default: 127.0.0.1
+
+  terminal_user:
+    type: string
+    description: >
+       terminal server user
+    default: terminal
+  terminal_password:
+    type: string
+    description: >
+       terminal server user password
+    default: terminal
+
+  terminal_key_content:
+    type: string
+    description: >
+       terminal server user rsa key content, can be used instead password
+    default: ""
+
+  terminal_port:
+    type: integer
+    description: >
+       terminal server port, for fortigate ssh by default 22
+    default: 22
+
+node_templates:
+
+  vyos_hub:
+    type: cloudify.terminal.raw
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          inputs:
+            terminal_auth: &terminal_auth
+              user: { get_input: terminal_user }
+              password: { get_input: terminal_password }
+              ip: { get_input: terminal_ip }
+              promt_check:
+                - '#'
+                - '$'
+              errors:
+                - "Command fail."
+            calls:
+              - action: exit
+        start:
+          inputs:
+            terminal_auth: *terminal_auth
+            calls:
+              - action: config
+              - template: vyos-hub-template.txt
+              - action: commit
+              - action: save
+        stop:
+          inputs:
+            terminal_auth: *terminal_auth
+            calls:
+              - action: config
+              - action: delete interface tunnel tun3
+              - action: commit
+              - action: save
